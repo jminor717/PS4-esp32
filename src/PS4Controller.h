@@ -72,6 +72,8 @@ public:
   int8_t RStickX() { return data.analog.stick.rx; }
   int8_t RStickY() { return data.analog.stick.ry; }
 
+  ps4_sensor_t SensorData() {return data.sensor; }
+
   uint8_t Battery() { return data.status.battery; }
   bool Charging() { return data.status.charging; }
   bool Audio() { return data.status.audio; }

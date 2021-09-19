@@ -7,20 +7,35 @@
 /*                            L O C A L    T Y P E S */
 /********************************************************************************/
 
-enum ps4_packet_index {
-  packet_index_analog_stick_lx = 13,
-  packet_index_analog_stick_ly = 14,
-  packet_index_analog_stick_rx = 15,
-  packet_index_analog_stick_ry = 16,
+//https://www.psdevwiki.com/ps4/DS4-BT#Structure_HID_transaction_.28portion.29
+enum ps4_packet_index
+{
+    //packet structure as received here is 9 bytes offset form the structure listed on the above wiki
+    packet_index_analog_stick_lx = 13,
+    packet_index_analog_stick_ly = 14,
+    packet_index_analog_stick_rx = 15,
+    packet_index_analog_stick_ry = 16,
 
-  packet_index_button_standard = 17,
-  packet_index_button_extra = 18,
-  packet_index_button_ps = 19,
+    packet_index_button_standard = 17, //8
+    packet_index_button_extra = 18,    //9
+    packet_index_button_ps = 19,       //10
 
-  packet_index_analog_l2 = 20,
-  packet_index_analog_r2 = 21,
+    packet_index_analog_l2 = 20,
+    packet_index_analog_r2 = 21,
 
-  packet_index_status = 42
+    //22-23 	Seems to be a timestamp. A common increment value between two reports is 188 (at full rate the report period is 1.25ms). This timestamp is used by the PS4 to process acceleration and gyroscope data.
+    //24 battery
+
+    packet_index_sensor_gyroscope_x = 25,
+    packet_index_sensor_gyroscope_y = 27,
+    packet_index_sensor_gyroscope_z = 29,
+
+    packet_index_sensor_accelerometer_x = 31,
+    packet_index_sensor_accelerometer_y = 33,
+    packet_index_sensor_accelerometer_z = 35,
+
+    packet_index_status = 42,
+
 };
 
 enum ps4_button_mask {
@@ -92,7 +107,7 @@ void parsePacket(uint8_t* packet) {
   ps4.button = parsePacketButtons(packet);
   ps4.analog.stick = parsePacketAnalogStick(packet);
   ps4.analog.button = parsePacketAnalogButton(packet);
-  // ps4.sensor = parsePacketSensor(packet);
+  ps4.sensor = parsePacketSensor(packet);
   ps4.status = parsePacketStatus(packet);
   ps4.latestPacket = packet;
 
@@ -261,19 +276,16 @@ ps4_status_t parsePacketStatus(uint8_t* packet) {
 /********************/
 /*   S E N S O R S  */
 /********************/
-ps4_sensor_t parsePacketSensor(uint8_t* packet) {
-  ps4_sensor_t ps4Sensor;
-  /*
-      const uint16_t offset = 0x200;
+ps4_sensor_t parsePacketSensor(uint8_t *packet)
+{
+    ps4_sensor_t ps4Sensor;
 
-      ps4Sensor.accelerometer.x = (packet[packet_index_sensor_accelerometer_x] << 8) +
-     packet[packet_index_sensor_accelerometer_x+1] - offset;
-      ps4Sensor.accelerometer.y = (packet[packet_index_sensor_accelerometer_y] << 8) +
-     packet[packet_index_sensor_accelerometer_y+1] - offset;
-      ps4Sensor.accelerometer.z = (packet[packet_index_sensor_accelerometer_z] << 8) +
-     packet[packet_index_sensor_accelerometer_z+1] - offset;
-      ps4Sensor.gyroscope.z     = (packet[packet_index_sensor_gyroscope_z]
-     << 8) + packet[packet_index_sensor_gyroscope_z+1]     - offset;
-  */
-  return ps4Sensor;
+    ps4Sensor.accelerometer.x = (packet[packet_index_sensor_accelerometer_x + 1] << 8) + packet[packet_index_sensor_accelerometer_x];
+    ps4Sensor.accelerometer.y = (packet[packet_index_sensor_accelerometer_y + 1] << 8) + packet[packet_index_sensor_accelerometer_y];
+    ps4Sensor.accelerometer.z = (packet[packet_index_sensor_accelerometer_z + 1] << 8) + packet[packet_index_sensor_accelerometer_z];
+    ps4Sensor.gyroscope.x = (packet[packet_index_sensor_gyroscope_x + 1] << 8) + packet[packet_index_sensor_gyroscope_x + 1];
+    ps4Sensor.gyroscope.y = (packet[packet_index_sensor_gyroscope_y + 1] << 8) + packet[packet_index_sensor_gyroscope_y + 1];
+    ps4Sensor.gyroscope.z = (packet[packet_index_sensor_gyroscope_z + 1] << 8) + packet[packet_index_sensor_gyroscope_z + 1];
+
+    return ps4Sensor;
 }

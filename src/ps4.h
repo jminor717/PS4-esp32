@@ -79,7 +79,9 @@ typedef struct {
 /********************/
 
 typedef struct {
-  int16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 } ps4_sensor_gyroscope_t;
 
 typedef struct {

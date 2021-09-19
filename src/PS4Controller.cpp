@@ -54,7 +54,9 @@ bool PS4Controller::begin(char* mac) {
   return begin();
 }
 
-bool PS4Controller::end() {}
+bool PS4Controller::end() {
+    return false;
+}
 
 bool PS4Controller::isConnected() { return ps4IsConnected(); }
 
